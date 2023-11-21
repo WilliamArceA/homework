@@ -4,6 +4,7 @@ import com.diplomado.homework.dto.RoleDTO;
 import com.diplomado.homework.services.RoleService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.diplomado.homework.web.exceptions.RoleByIdNotFoundException;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -33,9 +34,8 @@ public final class RoleController {
     }
     @GetMapping("/{roleId}")
     public ResponseEntity<RoleDTO> readRole(@PathVariable Integer roleId) {
-        return roleService.getRole(roleId)
-                .map(role -> ResponseEntity.ok().body(role))
-                .orElse(ResponseEntity.notFound().build());
+        RoleDTO role = roleService.getRole(roleId).orElseThrow(() -> new RoleByIdNotFoundException(roleId));
+        return ResponseEntity.ok().body(role);
     }
     @DeleteMapping("/{roleId}")
     public ResponseEntity<Void> deleteRole(@PathVariable Integer roleId){
