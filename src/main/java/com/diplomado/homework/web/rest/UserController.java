@@ -4,6 +4,7 @@ import com.diplomado.homework.dto.UserDTO;
 import com.diplomado.homework.services.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.diplomado.homework.web.exceptions.UserByIdNotFoundException;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -31,15 +32,16 @@ public final class UserController {
             throw new IllegalArgumentException("A new user can't have an id " + user.getId());
         }
         user.setCreatedAt(LocalDateTime.now());
+        System.out.println("aaaaa");
         final UserDTO newUser = userService.createUser(user);
+        System.out.println("bbbbb");
         return ResponseEntity.created(new URI("/v1/users" + newUser.getId())).body(newUser);
     }
 
     @GetMapping("/{userId}")
     public ResponseEntity<UserDTO> readUser(@PathVariable Long userId) {
-        return userService.getUser(userId)
-                .map(user -> ResponseEntity.ok().body(user))
-                .orElse(ResponseEntity.notFound().build());
+        UserDTO user = userService.getUser(userId).orElseThrow(() -> new UserByIdNotFoundException(userId));
+        return ResponseEntity.ok().body(user);
     }
 
 

@@ -7,6 +7,7 @@ import com.diplomado.homework.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.diplomado.homework.web.exceptions.DetailsByUserIdNotFoundException;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -31,9 +32,8 @@ public final class UserDetailController {
     }
     @GetMapping("/{userId}")
     public ResponseEntity<UserDetailDTO> getDetailByUser(@PathVariable Long userId) {
-        return userDetailService.getUserDetail(userId)
-                .map(userDetail -> ResponseEntity.ok().body(userDetail))
-                .orElse(ResponseEntity.notFound().build());
+        UserDetailDTO userDetail = userDetailService.getUserDetail(userId).orElseThrow(() -> new DetailsByUserIdNotFoundException(userId));
+        return ResponseEntity.ok().body(userDetail);
     }
 
     @PostMapping
